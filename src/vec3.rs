@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Vec3 {
     data: [f64; 3],
 }
@@ -116,10 +116,7 @@ impl std::ops::Mul<f64> for Vec3 {
     type Output = Self;
 
     fn mul(mut self, scalar: f64) -> Self::Output {
-        self.data[0] *= scalar;
-        self.data[1] *= scalar;
-        self.data[2] *= scalar;
-        self
+        &self * scalar
     }
 }
 
@@ -140,11 +137,23 @@ impl std::ops::Mul for &Vec3 {
 impl std::ops::Div<f64> for Vec3 {
     type Output = Self;
 
-    fn div(mut self, scalar: f64) -> Self::Output {
+    fn div(mut self, scalar: f64) -> Vec3 {
         assert_ne!(scalar, 0.0);
-        self = self * (1.0 / scalar);
-        self
+        Vec3 {
+            data: [
+                self.data[0] / scalar,
+                self.data[1] / scalar,
+                self.data[2] / scalar,
+            ],
+        }
     }
+}
+
+#[macro_export]
+macro_rules! vec3 {
+    ($x:expr, $y:expr, $z:expr ) => {
+        $crate::vec3::Vec3::new([$x, $y, $z])
+    };
 }
 
 #[cfg(test)]
