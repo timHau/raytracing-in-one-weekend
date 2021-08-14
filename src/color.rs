@@ -8,14 +8,26 @@ macro_rules! color {
     };
 }
 
+impl Color {
+    pub(crate) fn write(&self, samples_per_pixel: u32) -> String {
+        let scale = 1.0 / samples_per_pixel as f64;
+        format!(
+            "{} {} {} ",
+            (256.0 * (self.x() * scale).clamp(0.0, 0.999)) as u8,
+            (256.0 * (self.y() * scale).clamp(0.0, 0.999)) as u8,
+            (256.0 * (self.z() * scale).clamp(0.0, 0.999)) as u8,
+        )
+    }
+}
+
 impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "{} {} {}",
-            (255.999 * self.x()) as i64,
-            (255.999 * self.y()) as i64,
-            (255.999 * self.z()) as i64,
+            (256.0 * self.x().clamp(0.0, 0.999)) as u8,
+            (256.0 * self.y().clamp(0.0, 0.999)) as u8,
+            (256.0 * self.z().clamp(0.0, 0.999)) as u8,
         )
     }
 }
