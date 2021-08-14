@@ -13,7 +13,7 @@ use point::Point;
 use crate::{
     camera::Camera,
     hittable::HittableList,
-    material::{Lambertian, Metal},
+    material::{Dielectric, Lambertian, Metal},
     sphere::Sphere,
 };
 
@@ -28,7 +28,8 @@ fn main() {
     // World
     let mut world = HittableList::new();
 
-    let material_center = Lambertian::new(color![0.7, 0.3, 0.3]);
+    // let material_center = Lambertian::new(color![0.7, 0.3, 0.3]);
+    let material_center = Dielectric::new(1.5);
     let sphere_center = Sphere::new(point!(0.0, 0.0, -1.0), 0.5, &material_center);
     world.add(&sphere_center);
 

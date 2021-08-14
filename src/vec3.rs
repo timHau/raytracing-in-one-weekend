@@ -90,6 +90,13 @@ impl Vec3 {
     pub(crate) fn reflect(v: &Vec3, n: &Vec3) -> Self {
         v - &(2.0 * v.dot(n) * n)
     }
+
+    pub(crate) fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3 {
+        let cos_theta = (-uv).dot(&n).min(1.0);
+        let r_out_perp = etai_over_etat * &(uv + &(n * cos_theta));
+        let r_out_parallel = -(1.0 - r_out_perp.len_square()).abs().sqrt() * n;
+        r_out_perp + r_out_parallel
+    }
 }
 
 impl std::ops::Add for Vec3 {
@@ -134,11 +141,18 @@ impl std::ops::Sub for &Vec3 {
 impl std::ops::Neg for Vec3 {
     type Output = Self;
 
-    fn neg(mut self) -> Self::Output {
-        self.data[0] = -self.data[0];
-        self.data[1] = -self.data[1];
-        self.data[2] = -self.data[2];
-        self
+    fn neg(self) -> Self::Output {
+        -&self
+    }
+}
+
+impl std::ops::Neg for &Vec3 {
+    type Output = Vec3;
+
+    fn neg(self) -> Self::Output {
+        Vec3 {
+            data: [-self.data[0], -self.data[1], -self.data[2]],
+        }
     }
 }
 
@@ -264,6 +278,12 @@ mod tests {
     #[test]
     fn neg() {
         let v = Vec3::new([1.0, 2.0, 3.0]);
+        assert_eq!(-v, Vec3::new([-1.0, -2.0, -3.0]));
+    }
+
+    #[test]
+    fn neg_borrow() {
+        let v = &Vec3::new([1.0, 2.0, 3.0]);
         assert_eq!(-v, Vec3::new([-1.0, -2.0, -3.0]));
     }
 
