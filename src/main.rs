@@ -8,6 +8,8 @@ mod sphere;
 mod utils;
 mod vec3;
 
+use std::f64::consts::PI;
+
 use point::Point;
 
 use crate::{
@@ -26,26 +28,30 @@ fn main() {
     let max_depth = 50;
 
     // World
+    let r = (PI / 4.0).cos();
     let mut world = HittableList::new();
 
     let material_center = Lambertian::new(color!(0.1, 0.2, 0.5));
-    let sphere_center = Sphere::new(point!(0.0, 0.0, -1.0), 0.5, &material_center);
-    world.add(&sphere_center);
-
     let material_left = Dielectric::new(1.5);
-    let sphere_left = Sphere::new(point!(-1.0, 0.0, -1.0), 0.5, &material_left);
-    world.add(&sphere_left);
-
     let material_right = Metal::new(color!(0.8, 0.6, 0.2), 0.0);
-    let sphere_right = Sphere::new(point!(1.0, 0.0, -1.0), 0.5, &material_right);
-    world.add(&sphere_right);
-
     let material_world = Lambertian::new(color![0.8, 0.8, 0.0]);
+
+    let sphere_center = Sphere::new(point!(0.0, 0.0, -1.0), 0.5, &material_center);
+    let sphere_left = Sphere::new(point!(-1.0, 0.0, -1.0), 0.5, &material_left);
+    let sphere_right = Sphere::new(point!(1.0, 0.0, -1.0), 0.5, &material_right);
     let sphere_world = Sphere::new(point!(0.0, -100.5, -1.0), 100.0, &material_world);
+
+    world.add(&sphere_center);
+    world.add(&sphere_left);
+    world.add(&sphere_right);
     world.add(&sphere_world);
 
     // Camera
-    let camera = Camera::new();
+    let look_from = point!(-2.0, 2.0, 1.0);
+    let look_at = point!(0.0, 0.0, -1.0);
+    let view_up = vec3!(0.0, 1.0, 0.0);
+    let vertical_fov = 20.0;
+    let camera = Camera::new(look_from, look_at, view_up, vertical_fov, aspect_ratio);
 
     println!("P3");
     println!("{} {}", image_width, image_height);
