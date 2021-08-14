@@ -1,26 +1,38 @@
 use std::vec;
 
-use crate::{point::Point, ray::Ray, vec3::Vec3};
+use crate::{
+    material::{Lambertian, Material},
+    point::Point,
+    ray::Ray,
+    vec3::Vec3,
+};
 
 pub(crate) trait Hittable {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
 
-#[derive(Debug)]
-pub(crate) struct HitRecord {
+pub(crate) struct HitRecord<'a> {
     pub(crate) point: Point,
     pub(crate) normal: Vec3,
     pub(crate) t: f64,
     pub(crate) front_face: bool,
+    pub(crate) material: &'a dyn Material,
 }
 
-impl HitRecord {
-    pub(crate) fn new(point: Point, normal: Vec3, t: f64, front_face: bool) -> Self {
+impl<'a> HitRecord<'a> {
+    pub(crate) fn new(
+        point: Point,
+        normal: Vec3,
+        t: f64,
+        front_face: bool,
+        material: &'a dyn Material,
+    ) -> Self {
         Self {
             point,
             normal,
             t,
             front_face,
+            material,
         }
     }
 

@@ -1,6 +1,7 @@
 mod camera;
 mod color;
 mod hittable;
+mod material;
 mod point;
 mod ray;
 mod sphere;
@@ -9,7 +10,12 @@ mod vec3;
 
 use point::Point;
 
-use crate::{camera::Camera, hittable::HittableList, sphere::Sphere};
+use crate::{
+    camera::Camera,
+    hittable::HittableList,
+    material::{Lambertian, Metal},
+    sphere::Sphere,
+};
 
 fn main() {
     // Image
@@ -21,10 +27,22 @@ fn main() {
 
     // World
     let mut world = HittableList::new();
-    let sphere_1 = Sphere::new(point!(0.0, 0.0, -1.0), 0.5);
-    world.add(&sphere_1);
-    let sphere_2 = Sphere::new(point!(0.0, -100.5, -1.0), 100.0);
-    world.add(&sphere_2);
+
+    let material_center = Lambertian::new(color![0.7, 0.3, 0.3]);
+    let sphere_center = Sphere::new(point!(0.0, 0.0, -1.0), 0.5, &material_center);
+    world.add(&sphere_center);
+
+    let material_left = Metal::new(color![0.8, 0.8, 0.8]);
+    let sphere_left = Sphere::new(point!(-1.0, 0.0, -1.0), 0.5, &material_left);
+    world.add(&sphere_left);
+
+    let material_right = Metal::new(color!(0.8, 0.6, 0.2));
+    let sphere_right = Sphere::new(point!(1.0, 0.0, -1.0), 0.5, &material_right);
+    world.add(&sphere_right);
+
+    let material_world = Lambertian::new(color![0.8, 0.8, 0.0]);
+    let sphere_world = Sphere::new(point!(0.0, -100.5, -1.0), 100.0, &material_world);
+    world.add(&sphere_world);
 
     // Camera
     let camera = Camera::new();

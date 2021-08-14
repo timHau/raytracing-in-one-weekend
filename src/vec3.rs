@@ -81,6 +81,15 @@ impl Vec3 {
         let len = self.len();
         self / len
     }
+
+    pub(crate) fn near_zero(&self) -> bool {
+        let s = 1e-8;
+        self.data[0].abs() < s && self.data[1].abs() < s && self.data[2].abs() < s
+    }
+
+    pub(crate) fn reflect(v: &Vec3, n: &Vec3) -> Self {
+        v - &(2.0 * v.dot(n) * n)
+    }
 }
 
 impl std::ops::Add for Vec3 {
