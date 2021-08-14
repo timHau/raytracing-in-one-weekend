@@ -13,9 +13,9 @@ impl Color {
         let scale = 1.0 / samples_per_pixel as f64;
         format!(
             "{} {} {} ",
-            (256.0 * (self.x() * scale).clamp(0.0, 0.999)) as u8,
-            (256.0 * (self.y() * scale).clamp(0.0, 0.999)) as u8,
-            (256.0 * (self.z() * scale).clamp(0.0, 0.999)) as u8,
+            (256.0 * (self.x() * scale).sqrt().clamp(0.0, 0.999)) as u8,
+            (256.0 * (self.y() * scale).sqrt().clamp(0.0, 0.999)) as u8,
+            (256.0 * (self.z() * scale).sqrt().clamp(0.0, 0.999)) as u8,
         )
     }
 }

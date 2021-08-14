@@ -15,10 +15,19 @@ impl Ray {
         self.origin + &self.direction * t
     }
 
-    pub(crate) fn color(&self, world: &dyn Hittable) -> Color {
-        let hit_record = world.hit(self, 0.0, f64::INFINITY);
+    pub(crate) fn color(&self, world: &dyn Hittable, depth: u64) -> Color {
+        let hit_record = world.hit(self, 0.001, f64::INFINITY);
         match hit_record {
-            Some(rec) => (rec.normal + Color::new([1.0, 1.0, 1.0])) * 0.5,
+            Some(rec) => {
+                if depth <= 0 {
+                    return Color::new([0.0, 0.0, 0.0]);
+                }
+
+                let target = &(&rec.point + &rec.normal) + &Vec3::random_in_hemisphere(&rec.normal);
+                let next_direction = &target - &rec.point;
+                let next_ray = Ray::new(rec.point, next_direction);
+                next_ray.color(world, depth - 1) * 0.5
+            }
             None => {
                 let unit_direction = self.direction.as_unit_vec();
                 let t = 0.5 * (unit_direction.y() + 1.0);

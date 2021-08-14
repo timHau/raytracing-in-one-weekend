@@ -1,0 +1,14 @@
+[tasks.clean]
+command = "rm"
+args = ["-f", "image.ppm"]
+
+[tasks.run]
+script = [
+	"cargo run --release > image.ppm"
+]
+
+[tasks.all]
+dependencies = [
+	"clean",
+	"run"
+]

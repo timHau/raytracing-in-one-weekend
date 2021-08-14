@@ -1,3 +1,5 @@
+use rand::Rng;
+
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Vec3 {
     data: [f64; 3],
@@ -40,6 +42,39 @@ impl Vec3 {
                 self.data[0] * other.data[1] - self.data[1] * other.data[0],
             ],
         }
+    }
+
+    pub(crate) fn random(min: f64, max: f64) -> Self {
+        let mut rng = rand::thread_rng();
+        Self {
+            data: [
+                rng.gen_range(min..max),
+                rng.gen_range(min..max),
+                rng.gen_range(min..max),
+            ],
+        }
+    }
+
+    pub(crate) fn random_in_unit_sphere() -> Self {
+        let mut p = Self::random(-1.0, 1.0);
+        while p.len_square() >= 1.0 {
+            p = Self::random(-1.0, 1.0);
+        }
+        p
+    }
+
+    pub(crate) fn random_in_hemisphere(normal: &Self) -> Self {
+        let in_unit_sphere = Self::random_in_unit_sphere();
+        if in_unit_sphere.dot(normal) > 0.0 {
+            // in same hemisphere as the normal
+            in_unit_sphere
+        } else {
+            -in_unit_sphere
+        }
+    }
+
+    pub(crate) fn random_unit_vec() -> Self {
+        Self::random_in_unit_sphere().as_unit_vec()
     }
 
     pub(crate) fn as_unit_vec(self) -> Self {
@@ -112,10 +147,18 @@ impl std::ops::Mul<f64> for &Vec3 {
     }
 }
 
+impl std::ops::Mul<&Vec3> for f64 {
+    type Output = Vec3;
+
+    fn mul(self, other: &Vec3) -> Self::Output {
+        other * self
+    }
+}
+
 impl std::ops::Mul<f64> for Vec3 {
     type Output = Self;
 
-    fn mul(mut self, scalar: f64) -> Self::Output {
+    fn mul(self, scalar: f64) -> Self::Output {
         &self * scalar
     }
 }
