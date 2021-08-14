@@ -71,7 +71,7 @@ fn main() {
     let aspect_ratio = 3.0 / 2.0;
     let image_width = 1200 as u64;
     let image_height = ((image_width as f64) / aspect_ratio) as u64;
-    let samples_per_pixel = 500;
+    let samples_per_pixel = 10;
     let max_depth = 50;
 
     // World
@@ -82,8 +82,8 @@ fn main() {
     let look_from = point!(13.0, 2.0, 3.0);
     let look_at = point!(0.0, 0.0, 0.0);
     let view_up = vec3!(0.0, 1.0, 0.0);
-    let vertical_fov = 10.0;
-    let dist_to_focus = (look_from - look_at).len();
+    let vertical_fov = 20.0;
+    let dist_to_focus = 10.0;
     let aperture = 0.1;
     let camera = Camera::new(
         look_from,
