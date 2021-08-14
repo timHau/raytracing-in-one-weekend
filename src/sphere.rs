@@ -23,10 +23,10 @@ impl<'a> Sphere<'a> {
 
 impl<'a> Hittable for Sphere<'a> {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        let oc = &ray.origin - &self.center;
+        let oc = ray.origin - self.center;
         let a = ray.direction.len_square();
         let half_b = oc.dot(&ray.direction);
-        let c = oc.len_square() - &self.radius * &self.radius;
+        let c = oc.len_square() - self.radius * self.radius;
 
         let discriminant = half_b * half_b - a * c;
         if discriminant < 0.0 {

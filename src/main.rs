@@ -47,11 +47,21 @@ fn main() {
     world.add(&sphere_world);
 
     // Camera
-    let look_from = point!(-2.0, 2.0, 1.0);
+    let look_from = point!(3.0, 3.0, 2.0);
     let look_at = point!(0.0, 0.0, -1.0);
     let view_up = vec3!(0.0, 1.0, 0.0);
     let vertical_fov = 20.0;
-    let camera = Camera::new(look_from, look_at, view_up, vertical_fov, aspect_ratio);
+    let dist_to_focus = (look_from - look_at).len();
+    let aperture = 2.0;
+    let camera = Camera::new(
+        look_from,
+        look_at,
+        view_up,
+        vertical_fov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+    );
 
     println!("P3");
     println!("{} {}", image_width, image_height);

@@ -124,6 +124,14 @@ impl std::ops::Add for &Vec3 {
     }
 }
 
+impl std::ops::Sub for Vec3 {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self::Output {
+        &self - &other
+    }
+}
+
 impl std::ops::Sub for &Vec3 {
     type Output = Vec3;
 
