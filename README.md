@@ -4,8 +4,18 @@ I followed the awesome Tutorial [Ray Tracing in One Weekend](https://raytracing.
 
 ## Render an image
 
-I use [cargo-make](https://github.com/sagiegurari/cargo-make) to clean up and render a new image. Just type
+If you use [cargo-make](https://github.com/sagiegurari/cargo-make) you can simply do
 
 ```
 cargo make all
 ```
+
+otherwise just do
+
+```
+cargo run --release > image.ppm
+```
+
+## Suggestions
+
+I think Performance could be improved, if you find improvements just let me know.
