@@ -4,7 +4,7 @@ args = ["-f", "image.ppm"]
 
 [tasks.run]
 script = [
-	"cargo run --release > image.ppm"
+	"RUSTFLAGS=\"-C target-cpu=native\" cargo run --release > image.ppm"
 ]
 
 [tasks.all]

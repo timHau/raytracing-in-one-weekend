@@ -1,31 +1,26 @@
 use std::vec;
 
-use crate::{
-    material::{Lambertian, Material},
-    point::Point,
-    ray::Ray,
-    vec3::Vec3,
-};
+use crate::{material::Material, point::Point, ray::Ray, vec3::Vec3};
 
 pub(crate) trait Hittable {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
 
-pub(crate) struct HitRecord<'a> {
+pub(crate) struct HitRecord {
     pub(crate) point: Point,
     pub(crate) normal: Vec3,
     pub(crate) t: f64,
     pub(crate) front_face: bool,
-    pub(crate) material: &'a dyn Material,
+    pub(crate) material: Box<dyn Material>,
 }
 
-impl<'a> HitRecord<'a> {
+impl HitRecord {
     pub(crate) fn new(
         point: Point,
         normal: Vec3,
         t: f64,
         front_face: bool,
-        material: &'a dyn Material,
+        material: Box<dyn Material>,
     ) -> Self {
         Self {
             point,
@@ -46,25 +41,25 @@ impl<'a> HitRecord<'a> {
     }
 }
 
-pub(crate) struct HittableList<'a> {
-    objects: Vec<&'a dyn Hittable>,
+pub(crate) struct HittableList {
+    objects: Vec<Box<dyn Hittable>>,
 }
 
-impl<'a> HittableList<'a> {
+impl HittableList {
     pub(crate) fn new() -> Self {
         Self { objects: vec![] }
     }
 
-    pub(crate) fn clear(&mut self) {
+    pub(crate) fn _clear(&mut self) {
         self.objects = vec![];
     }
 
-    pub(crate) fn add(&mut self, object: &'a dyn Hittable) {
+    pub(crate) fn add(&mut self, object: Box<dyn Hittable>) {
         self.objects.push(object);
     }
 }
 
-impl<'a> Hittable for HittableList<'a> {
+impl Hittable for HittableList {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let mut temp_record = None;
         let mut closest_so_far = t_max;

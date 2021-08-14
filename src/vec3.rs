@@ -6,34 +6,42 @@ pub struct Vec3 {
 }
 
 impl Vec3 {
+    #[inline]
     pub(crate) fn new(data: [f64; 3]) -> Self {
         Self { data }
     }
 
+    #[inline]
     pub(crate) fn x(&self) -> f64 {
         self.data[0]
     }
 
+    #[inline]
     pub(crate) fn y(&self) -> f64 {
         self.data[1]
     }
 
+    #[inline]
     pub(crate) fn z(&self) -> f64 {
         self.data[2]
     }
 
+    #[inline]
     pub(crate) fn len(&self) -> f64 {
         self.len_square().sqrt()
     }
 
+    #[inline]
     pub(crate) fn len_square(&self) -> f64 {
         self.dot(self)
     }
 
+    #[inline]
     pub(crate) fn dot(&self, other: &Self) -> f64 {
         self.data[0] * other.data[0] + self.data[1] * other.data[1] + self.data[2] * other.data[2]
     }
 
+    #[inline]
     pub(crate) fn cross(&self, other: &Self) -> Vec3 {
         Vec3 {
             data: [
@@ -44,6 +52,7 @@ impl Vec3 {
         }
     }
 
+    #[inline]
     pub(crate) fn random(min: f64, max: f64) -> Self {
         let mut rng = rand::thread_rng();
         Self {
@@ -55,6 +64,7 @@ impl Vec3 {
         }
     }
 
+    #[inline]
     pub(crate) fn random_in_unit_sphere() -> Self {
         let mut p = Self::random(-1.0, 1.0);
         while p.len_square() >= 1.0 {
@@ -63,7 +73,8 @@ impl Vec3 {
         p
     }
 
-    pub(crate) fn random_in_hemisphere(normal: &Self) -> Self {
+    #[inline]
+    pub(crate) fn _random_in_hemisphere(normal: &Self) -> Self {
         let in_unit_sphere = Self::random_in_unit_sphere();
         if in_unit_sphere.dot(normal) > 0.0 {
             // in same hemisphere as the normal
@@ -73,24 +84,29 @@ impl Vec3 {
         }
     }
 
-    pub(crate) fn random_unit_vec() -> Self {
+    #[inline]
+    pub(crate) fn _random_unit_vec() -> Self {
         Self::random_in_unit_sphere().as_unit_vec()
     }
 
+    #[inline]
     pub(crate) fn as_unit_vec(self) -> Self {
         let len = self.len();
         self / len
     }
 
+    #[inline]
     pub(crate) fn near_zero(&self) -> bool {
         let s = 1e-8;
         self.data[0].abs() < s && self.data[1].abs() < s && self.data[2].abs() < s
     }
 
+    #[inline]
     pub(crate) fn reflect(v: &Vec3, n: &Vec3) -> Self {
         v - &(2.0 * v.dot(n) * n)
     }
 
+    #[inline]
     pub(crate) fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3 {
         let cos_theta = (-uv).dot(&n).min(1.0);
         let r_out_perp = etai_over_etat * &(uv + &(n * cos_theta));
@@ -102,6 +118,7 @@ impl Vec3 {
 impl std::ops::Add for Vec3 {
     type Output = Self;
 
+    #[inline]
     fn add(mut self, other: Self) -> Self::Output {
         self.data[0] += other.data[0];
         self.data[1] += other.data[1];
@@ -113,6 +130,7 @@ impl std::ops::Add for Vec3 {
 impl std::ops::Add for &Vec3 {
     type Output = Vec3;
 
+    #[inline]
     fn add(self, other: Self) -> Self::Output {
         Vec3 {
             data: [
@@ -127,6 +145,7 @@ impl std::ops::Add for &Vec3 {
 impl std::ops::Sub for Vec3 {
     type Output = Self;
 
+    #[inline]
     fn sub(self, other: Self) -> Self::Output {
         &self - &other
     }
@@ -135,6 +154,7 @@ impl std::ops::Sub for Vec3 {
 impl std::ops::Sub for &Vec3 {
     type Output = Vec3;
 
+    #[inline]
     fn sub(self, other: Self) -> Self::Output {
         Vec3 {
             data: [
@@ -149,6 +169,7 @@ impl std::ops::Sub for &Vec3 {
 impl std::ops::Neg for Vec3 {
     type Output = Self;
 
+    #[inline]
     fn neg(self) -> Self::Output {
         -&self
     }
@@ -157,6 +178,7 @@ impl std::ops::Neg for Vec3 {
 impl std::ops::Neg for &Vec3 {
     type Output = Vec3;
 
+    #[inline]
     fn neg(self) -> Self::Output {
         Vec3 {
             data: [-self.data[0], -self.data[1], -self.data[2]],
@@ -167,6 +189,7 @@ impl std::ops::Neg for &Vec3 {
 impl std::ops::Mul<f64> for &Vec3 {
     type Output = Vec3;
 
+    #[inline]
     fn mul(self, scalar: f64) -> Self::Output {
         Vec3 {
             data: [
@@ -181,6 +204,7 @@ impl std::ops::Mul<f64> for &Vec3 {
 impl std::ops::Mul<&Vec3> for f64 {
     type Output = Vec3;
 
+    #[inline]
     fn mul(self, other: &Vec3) -> Self::Output {
         other * self
     }
@@ -189,6 +213,7 @@ impl std::ops::Mul<&Vec3> for f64 {
 impl std::ops::Mul<f64> for Vec3 {
     type Output = Self;
 
+    #[inline]
     fn mul(self, scalar: f64) -> Self::Output {
         &self * scalar
     }
@@ -197,6 +222,7 @@ impl std::ops::Mul<f64> for Vec3 {
 impl std::ops::Mul for &Vec3 {
     type Output = Vec3;
 
+    #[inline]
     fn mul(self, other: Self) -> Self::Output {
         Vec3 {
             data: [
@@ -211,7 +237,8 @@ impl std::ops::Mul for &Vec3 {
 impl std::ops::Div<f64> for Vec3 {
     type Output = Self;
 
-    fn div(mut self, scalar: f64) -> Vec3 {
+    #[inline]
+    fn div(self, scalar: f64) -> Vec3 {
         assert_ne!(scalar, 0.0);
         Vec3 {
             data: [

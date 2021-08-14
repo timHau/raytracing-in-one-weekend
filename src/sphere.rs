@@ -5,14 +5,20 @@ use crate::{
     ray::Ray,
 };
 
-pub(crate) struct Sphere<'a> {
+pub(crate) struct Sphere<M>
+where
+    M: Material + Copy + 'static,
+{
     center: Point,
     radius: f64,
-    material: &'a dyn Material,
+    material: Box<M>,
 }
 
-impl<'a> Sphere<'a> {
-    pub(crate) fn new(center: Point, radius: f64, material: &'a dyn Material) -> Self {
+impl<M> Sphere<M>
+where
+    M: Material + Copy + 'static,
+{
+    pub(crate) fn new(center: Point, radius: f64, material: Box<M>) -> Self {
         Self {
             center,
             radius,
@@ -21,7 +27,10 @@ impl<'a> Sphere<'a> {
     }
 }
 
-impl<'a> Hittable for Sphere<'a> {
+impl<M> Hittable for Sphere<M>
+where
+    M: Material + Copy + 'static,
+{
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin - self.center;
         let a = ray.direction.len_square();
@@ -45,7 +54,7 @@ impl<'a> Hittable for Sphere<'a> {
 
         let point = ray.at(root);
         let normal = (&point - &self.center) / self.radius;
-        let mut hit_record = HitRecord::new(point, normal, root, false, self.material.to_owned());
+        let mut hit_record = HitRecord::new(point, normal, root, false, Box::new(*self.material));
 
         let outward_normal = (&hit_record.point - &self.center) / self.radius;
         hit_record.set_face_normal(ray, outward_normal);

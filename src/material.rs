@@ -4,7 +4,7 @@ pub(crate) trait Material {
     fn scatter(&self, ray_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, Color)>;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub(crate) struct Lambertian {
     albedo: Color,
 }
@@ -16,7 +16,7 @@ impl Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, ray_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, Color)> {
+    fn scatter(&self, _ray_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, Color)> {
         let mut scatter_direction = hit_record.normal + Vec3::random_in_unit_sphere();
 
         if scatter_direction.near_zero() {
@@ -28,7 +28,7 @@ impl Material for Lambertian {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub(crate) struct Metal {
     albedo: Color,
     fuzz: f64,
@@ -55,7 +55,7 @@ impl Material for Metal {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub(crate) struct Dielectric {
     index_of_refraction: f64,
 }
