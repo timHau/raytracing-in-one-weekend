@@ -1,6 +1,6 @@
 use crate::{point::Point, ray::Ray, vec3::Vec3};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub(crate) struct Camera {
     origin: Point,
     lower_left_corner: Point,

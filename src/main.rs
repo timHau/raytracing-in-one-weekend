@@ -8,14 +8,15 @@ mod sphere;
 mod utils;
 mod vec3;
 
-use point::Point;
-
 use crate::{
     camera::Camera,
     hittable::HittableList,
     material::{Dielectric, Lambertian, Metal},
     sphere::Sphere,
 };
+use point::Point;
+use std::sync::mpsc::channel;
+use threadpool::ThreadPool;
 
 pub(crate) fn random_scene(world: &mut HittableList) {
     let ground_material = Lambertian::new(color![0.5, 0.5, 0.5]);
@@ -66,11 +67,13 @@ pub(crate) fn random_scene(world: &mut HittableList) {
 }
 
 fn main() {
+    let pool = ThreadPool::new(10);
+
     // Image
     let aspect_ratio = 3.0 / 2.0;
     let image_width = 1200 as u64;
     let image_height = ((image_width as f64) / aspect_ratio) as u64;
-    let samples_per_pixel = 500;
+    let samples_per_pixel = 100;
     let max_depth = 50;
 
     // World
@@ -98,18 +101,24 @@ fn main() {
     println!("{} {}", image_width, image_height);
     println!("255");
 
+    let (sender, receiver) = channel();
     for j in (0..image_height).rev() {
         eprintln!("Scanlines remaining: {}", j);
         for i in 0..image_width {
-            let mut pixel_color = color!(0.0, 0.0, 0.0);
-            for _s in 0..samples_per_pixel {
-                let u = (i as f64 + utils::random_float()) / ((image_width - 1) as f64);
-                let v = (j as f64 + utils::random_float()) / ((image_height - 1) as f64);
-                let ray = camera.get_ray(u, v);
-                pixel_color = pixel_color + ray.color(&world, max_depth);
-            }
+            let sender = sender.clone();
+            let world = world.clone();
+            pool.execute(move || {
+                let mut pixel_color = color!(0.0, 0.0, 0.0);
+                for _s in 0..samples_per_pixel {
+                    let u = (i as f64 + utils::random_float()) / ((image_width - 1) as f64);
+                    let v = (j as f64 + utils::random_float()) / ((image_height - 1) as f64);
+                    let ray = camera.get_ray(u, v);
+                    pixel_color = pixel_color + ray.color(&world, max_depth);
+                }
+                sender.send(pixel_color).unwrap();
+            });
 
-            println!("{}", pixel_color.write(samples_per_pixel));
+            println!("{}", receiver.recv().unwrap().write(samples_per_pixel));
         }
     }
 

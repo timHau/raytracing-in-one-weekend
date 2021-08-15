@@ -5,6 +5,7 @@ use crate::{
     ray::Ray,
 };
 
+#[derive(Clone)]
 pub(crate) struct Sphere<M>
 where
     M: Material + Copy + 'static,

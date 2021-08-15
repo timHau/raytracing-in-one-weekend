@@ -2,8 +2,24 @@ use std::vec;
 
 use crate::{material::Material, point::Point, ray::Ray, vec3::Vec3};
 
-pub(crate) trait Hittable {
+pub(crate) trait Hittable: HittableClone {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+}
+
+pub(crate) trait HittableClone {
+    fn clone_box(&self) -> Box<dyn Hittable + Send>;
+}
+
+impl<T: 'static + Hittable + Clone + Send> HittableClone for T {
+    fn clone_box(&self) -> Box<dyn Hittable + Send> {
+        Box::new(self.clone())
+    }
+}
+
+impl Clone for Box<dyn Hittable + Send> {
+    fn clone(&self) -> Self {
+        self.clone_box()
+    }
 }
 
 pub(crate) struct HitRecord {
@@ -41,8 +57,9 @@ impl HitRecord {
     }
 }
 
+#[derive(Clone)]
 pub(crate) struct HittableList {
-    objects: Vec<Box<dyn Hittable>>,
+    objects: Vec<Box<dyn Hittable + Send>>,
 }
 
 impl HittableList {
@@ -54,7 +71,7 @@ impl HittableList {
         self.objects = vec![];
     }
 
-    pub(crate) fn add(&mut self, object: Box<dyn Hittable>) {
+    pub(crate) fn add(&mut self, object: Box<dyn Hittable + Send>) {
         self.objects.push(object);
     }
 }

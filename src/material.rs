@@ -1,6 +1,6 @@
 use crate::{color::Color, hittable::HitRecord, ray::Ray, utils, vec3::Vec3};
 
-pub(crate) trait Material {
+pub(crate) trait Material: Send {
     fn scatter(&self, ray_in: &Ray, hit_record: &HitRecord) -> Option<(Ray, Color)>;
 }
 
