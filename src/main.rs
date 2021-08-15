@@ -8,74 +8,20 @@ mod sphere;
 mod utils;
 mod vec3;
 
-use point::Point;
-
-use crate::{
-    camera::Camera,
-    hittable::HittableList,
-    material::{Dielectric, Lambertian, Metal},
-    sphere::Sphere,
-};
-
-pub(crate) fn random_scene(world: &mut HittableList) {
-    let ground_material = Lambertian::new(color![0.5, 0.5, 0.5]);
-    let ground = Sphere::new(point![0.0, -1000.0, 0.0], 1000.0, Box::new(ground_material));
-    world.add(Box::new(ground));
-
-    for a in -11..11 {
-        for b in -11..11 {
-            let center = point![
-                a as f64 + 0.9 * utils::random_float(),
-                0.2,
-                b as f64 + 0.9 * utils::random_float()
-            ];
-
-            let choose_mat = utils::random_float();
-            if (center - point![4.0, 0.2, 0.0]).len() > 0.9 {
-                if choose_mat < 0.8 {
-                    let albedo = &color::Color::random(0.0, 1.0) * &color::Color::random(0.0, 1.0);
-                    let sphere_material = Lambertian::new(albedo);
-                    let sphere = Sphere::new(center, 0.2, Box::new(sphere_material));
-                    world.add(Box::new(sphere));
-                } else if choose_mat < 0.95 {
-                    let albedo = color::Color::random(0.5, 1.0);
-                    let fuzz = utils::random_range(0.0, 0.5);
-                    let sphere_material = Metal::new(albedo, fuzz);
-                    let sphere = Sphere::new(center, 0.2, Box::new(sphere_material));
-                    world.add(Box::new(sphere));
-                } else {
-                    let sphere_material = Dielectric::new(1.5);
-                    let sphere = Sphere::new(center, 0.2, Box::new(sphere_material));
-                    world.add(Box::new(sphere));
-                }
-            }
-        }
-    }
-
-    let material_1 = Dielectric::new(1.5);
-    let sphere_1 = Sphere::new(point![0.0, 1.0, 0.0], 1.0, Box::new(material_1));
-    world.add(Box::new(sphere_1));
-
-    let material_2 = Lambertian::new(color![0.4, 0.2, 0.1]);
-    let sphere_2 = Sphere::new(point![-4.0, 1.0, 0.0], 1.0, Box::new(material_2));
-    world.add(Box::new(sphere_2));
-
-    let material_3 = Metal::new(color![0.7, 0.6, 0.5], 0.0);
-    let sphere_3 = Sphere::new(point![4.0, 1.0, 0.0], 1.0, Box::new(material_3));
-    world.add(Box::new(sphere_3));
-}
+use crate::{camera::Camera, hittable::HittableList, point::Point};
+use indicatif::{ProgressBar, ProgressStyle};
 
 fn main() {
     // Image
     let aspect_ratio = 3.0 / 2.0;
     let image_width = 1200 as u64;
     let image_height = ((image_width as f64) / aspect_ratio) as u64;
-    let samples_per_pixel = 500;
+    let samples_per_pixel = 10;
     let max_depth = 50;
 
     // World
     let mut world = HittableList::new();
-    random_scene(&mut world);
+    utils::random_scene(&mut world);
 
     // Camera
     let look_from = point!(13.0, 2.0, 3.0);
@@ -98,8 +44,14 @@ fn main() {
     println!("{} {}", image_width, image_height);
     println!("255");
 
+    let bar = ProgressBar::new(image_height * image_width);
+    bar.set_style(
+        ProgressStyle::default_bar()
+            .template("[{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}")
+            .progress_chars("=> "),
+    );
     for j in (0..image_height).rev() {
-        eprintln!("Scanlines remaining: {}", j);
+        //eprintln!("Scanlines remaining: {}", j);
         for i in 0..image_width {
             let mut pixel_color = color!(0.0, 0.0, 0.0);
             for _s in 0..samples_per_pixel {
@@ -110,8 +62,10 @@ fn main() {
             }
 
             println!("{}", pixel_color.write(samples_per_pixel));
+            bar.inc(1);
         }
     }
 
-    eprintln!("Done.");
+    bar.finish();
+    //eprintln!("Done.");
 }
